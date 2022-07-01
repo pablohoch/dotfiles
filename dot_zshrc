@@ -98,14 +98,26 @@ if [[ "$TERM" == (xterm*|tmux*|screen*|rxvt*|putty*|cygwin|ansi) ]]; then
 
     # http://www.faqs.org/docs/Linux-mini/Xterm-Title.html#s3
     # https://zsh.sourceforge.io/Doc/Release/Prompt-Expansion.html
-    function xterm_title_precmd () {
-        print -Pn '\e]0;%1~\a'
-    }
 
-    function xterm_title_preexec () {
-        print -Pn '\e]0;%1~ %# '
-        print -n "${(q)1}\a"
-    }
+    if [[ -n "$SSH_CONNECTION" ]]; then
+        function xterm_title_precmd () {
+            print -Pn '\e]0;[%m] %1~\a'
+        }
+
+        function xterm_title_preexec () {
+            print -Pn '\e]0;[%m] %1~ %# '
+            print -n "${(q)1}\a"
+        }
+    else
+        function xterm_title_precmd () {
+            print -Pn '\e]0;%1~\a'
+        }
+
+        function xterm_title_preexec () {
+            print -Pn '\e]0;%1~ %# '
+            print -n "${(q)1}\a"
+        }
+    fi
 
     add-zsh-hook -Uz precmd xterm_title_precmd
     add-zsh-hook -Uz preexec xterm_title_preexec
