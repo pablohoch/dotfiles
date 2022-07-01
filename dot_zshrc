@@ -94,12 +94,14 @@ alias help=run-help
 if [[ "$TERM" == (screen*|xterm*|rxvt*|putty*|cygwin|ansi) ]]; then
     autoload -Uz add-zsh-hook
 
+    # http://www.faqs.org/docs/Linux-mini/Xterm-Title.html#s3
+    # https://zsh.sourceforge.io/Doc/Release/Prompt-Expansion.html
     function xterm_title_precmd () {
-        print -Pn '\e]2;%n@%m %1~\a'
+        print -Pn '\e]0;%1~\a'
     }
 
     function xterm_title_preexec () {
-        print -Pn '\e]2;%n@%m %1~ %# '
+        print -Pn '\e]0;%1~ %# '
         print -n "${(q)1}\a"
     }
 
