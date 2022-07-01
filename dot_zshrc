@@ -93,7 +93,7 @@ alias help=run-help
 ## xterm title ##
 #################
 
-if [[ "$TERM" == (screen*|xterm*|rxvt*|putty*|cygwin|ansi) ]]; then
+if [[ "$TERM" == (xterm*|tmux*|screen*|rxvt*|putty*|cygwin|ansi) ]]; then
     autoload -Uz add-zsh-hook
 
     # http://www.faqs.org/docs/Linux-mini/Xterm-Title.html#s3
