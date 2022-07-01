@@ -7,3 +7,6 @@
 truncation_length = 10
 truncate_to_repo = true
 
+[git_status]
+# WSL
+windows_starship = '/mnt/c/Users/Pablo/scoop/apps/starship/current/starship.exe'
