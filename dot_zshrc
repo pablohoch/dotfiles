@@ -1,0 +1,158 @@
+#############
+## History ##
+#############
+
+HISTFILE=~/.histfile
+HISTSIZE=50000
+SAVEHIST=10000
+setopt extended_history       # record timestamp of command in HISTFILE
+setopt hist_expire_dups_first # delete duplicates first when HISTFILE size exceeds HISTSIZE
+setopt hist_ignore_dups       # ignore duplicated commands history list
+setopt hist_ignore_space      # ignore commands that start with space
+setopt hist_verify            # show command with history expansion to user before running it
+setopt inc_append_history     # add commands to HISTFILE in order of execution
+setopt share_history          # share command history data
+
+################
+## Completion ##
+################
+
+zstyle :compinstall filename '$HOME/.zshrc'
+autoload -Uz compinit promptinit
+compinit
+promptinit
+zstyle ':completion:*' menu select
+zstyle ':completion:*' rehash true
+setopt COMPLETE_ALIASES
+
+#################
+## Keybindings ##
+#################
+
+bindkey -e
+
+############
+## Prompt ##
+############
+
+if command -v starship &> /dev/null; then
+    eval "$(starship init zsh)"
+else
+    function () {
+        local prompt_user='%{%B%}%{%F{red}%}%n%{%F{yellow}%}@%{%F{blue}%}%m%{%b%}'
+        local prompt_cwd='%{%F{yellow}%}%~%{%f%}'
+        local prompt_caret='%(!.%{%F{red}%}#.%{%F{white}%}$)%{%f%}'
+        local prompt_return_code='%(?..%{%F{red}%}%? ↵%{%f%} )'
+        PROMPT="${prompt_user} ${prompt_cwd} ${prompt_caret} "
+        RPROMPT="${prompt_return_code}"
+    }
+fi
+
+#############
+## Aliases ##
+#############
+
+if command -v exa &> /dev/null; then
+    alias l='exa -F'
+    alias ll='exa -lag'
+    alias la='exa -aF'
+else
+    alias l='ls -CF --color=auto'
+    alias ll='ls -alhF --color=auto'
+    alias la='ls -AF --color=auto'
+fi
+
+alias grep='grep --color=auto'
+alias fgrep='fgrep --color=auto'
+alias egrep='egrep --color=auto'
+alias cdiff='diff --color=always -u'
+
+alias gdbr='gdb -ex=r --args'
+alias gdbcr='gdb -ex="catch throw" -ex=r --args'
+alias lldbr='lldb -o r --'
+alias lldbcr='lldb -o "break set -E C++" -o r --'
+
+hr() {printf '━%.0s' $(seq $COLUMNS)}
+mvln() {mv $1 $2 && ln -s $2 $1}
+mkcd() {
+    case "$1" in /*) :;; *) set -- "./$1";; esac
+    mkdir -p "$1" && cd "$1"
+}
+
+##########
+## Help ##
+##########
+
+autoload -Uz run-help
+unalias run-help &>/dev/null
+alias help=run-help
+
+#################
+## xterm title ##
+#################
+
+if [[ "$TERM" == (screen*|xterm*|rxvt*|putty*|cygwin|ansi) ]]; then
+    autoload -Uz add-zsh-hook
+
+    function xterm_title_precmd () {
+        print -Pn '\e]2;%n@%m %1~\a'
+    }
+
+    function xterm_title_preexec () {
+        print -Pn '\e]2;%n@%m %1~ %# '
+        print -n "${(q)1}\a"
+    }
+
+	add-zsh-hook -Uz precmd xterm_title_precmd
+	add-zsh-hook -Uz preexec xterm_title_preexec
+fi
+
+#############
+## Plugins ##
+#############
+
+try_source () {
+    [ -f "$1" ] && source "$1"
+}
+
+try_source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+try_source ~/.zsh/zsh-history-substring-search/zsh-history-substring-search.zsh
+try_source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
+
+if command -v history-substring-search-up &> /dev/null; then
+    # https://github.com/zsh-users/zsh-history-substring-search
+    bindkey "$terminfo[kcuu1]" history-substring-search-up
+    bindkey "$terminfo[kcud1]" history-substring-search-down
+    bindkey -M emacs '^P' history-substring-search-up
+    bindkey -M emacs '^N' history-substring-search-down
+    bindkey -M vicmd 'k' history-substring-search-up
+    bindkey -M vicmd 'j' history-substring-search-down
+fi
+
+try_source ~/.fzf.zsh
+try_source ~/.iterm2_shell_integration.zsh
+
+command -v zoxide &> /dev/null && eval "$(zoxide init zsh)"
+
+if [ "$(uname -s)" = "Darwin" ]; then
+    export RUBY_CONFIGURE_OPTS="--with-openssl-dir=$(brew --prefix openssl@1.1)"
+    command -v rbenv &> /dev/null && eval "$(rbenv init -)"
+fi
+
+if command -v broot &> /dev/null; then
+    # broot --print-shell-function zsh
+    function br {
+        local cmd cmd_file code
+        cmd_file=$(mktemp)
+        if broot --outcmd "$cmd_file" "$@"; then
+            cmd=$(<"$cmd_file")
+            rm -f "$cmd_file"
+            eval "$cmd"
+        else
+            code=$?
+            rm -f "$cmd_file"
+            return "$code"
+        fi
+    }
+fi
+
