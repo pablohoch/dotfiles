@@ -126,8 +126,8 @@ try_source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 try_source ~/.zsh/zsh-history-substring-search/zsh-history-substring-search.zsh
 if command -v history-substring-search-up &> /dev/null; then
     # https://github.com/zsh-users/zsh-history-substring-search
-    bindkey "$terminfo[kcuu1]" history-substring-search-up
-    bindkey "$terminfo[kcud1]" history-substring-search-down
+    bindkey "${terminfo[kcuu1]:-^[[A}" history-substring-search-up
+    bindkey "${terminfo[kcud1]:-^[[B}" history-substring-search-down
     bindkey -M emacs '^P' history-substring-search-up
     bindkey -M emacs '^N' history-substring-search-down
     bindkey -M vicmd 'k' history-substring-search-up
