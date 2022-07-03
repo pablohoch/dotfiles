@@ -53,21 +53,26 @@ fi
 ## Aliases ##
 #############
 
+alias ls='ls --color=auto'
 if command -v exa &> /dev/null; then
     # https://the.exa.website/
     alias l='exa -F'
     alias ll='exa -lag'
     alias la='exa -aF'
 else
-    alias l='ls -CF --color=auto'
-    alias ll='ls -alhF --color=auto'
-    alias la='ls -AF --color=auto'
+    alias l='ls -CF'
+    alias ll='ls -alhF'
+    alias la='ls -AF'
 fi
 
 alias grep='grep --color=auto'
 alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
-alias cdiff='diff --color=always -u'
+alias diff='diff --color=auto'
+
+if command -v ip &> /dev/null; then
+    alias ip='ip -color=auto'
+fi
 
 alias gdbr='gdb -ex=r --args'
 alias gdbcr='gdb -ex="catch throw" -ex=r --args'
