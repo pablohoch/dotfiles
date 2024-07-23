@@ -54,11 +54,11 @@ fi
 #############
 
 alias ls='ls --color=auto'
-if command -v exa &> /dev/null; then
-    # https://the.exa.website/
-    alias l='exa -F'
-    alias ll='exa -lag'
-    alias la='exa -aF'
+if command -v eza &> /dev/null; then
+    # https://github.com/eza-community/eza
+    alias l='eza -F'
+    alias ll='eza -lag'
+    alias la='eza -aF'
 else
     alias l='ls -CF'
     alias ll='ls -alhF'
